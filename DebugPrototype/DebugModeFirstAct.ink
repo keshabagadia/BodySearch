@@ -3,6 +3,7 @@ INCLUDE Functions.ink
 ->Bedroom
 ===Bedroom===
     ______________________________________________
+    {knowBodySearch: Loop: {ResetLoop+1}}
     Location: Bedroom.
     Time: {time()}
     {minutes:
@@ -12,12 +13,13 @@ INCLUDE Functions.ink
     ->SevenAM
     =SevenAM
         Alarm rings.
-            * Asuka sleeps in and is 15 minutes late.
+            *[Sleep in and be late] Asuka sleeps in and is 15 minutes late.
             ~minutes+=15
             
-            *Asuka wakes up on time.
+            +[Wake up.] Asuka wakes up on time.
         
         - Asuka gets out of bed.
+        
         {SevenAM==1:
         ASUKA: Why do I have to be up this early again? Right... the goddamned committee meeting.
         -else:
@@ -26,10 +28,11 @@ INCLUDE Functions.ink
             
             -else:
             ASUKA: Couldn't the Body Search have started on any of my late mornings?
+            // {lockedRoomDiscovered && !talkedToYuki} Today I should talk to Yuki.
             }
         }
         
-            +Asuka gets ready in 30 minutes and heads down.
+            +[Go downstairs to the kitchen.]Asuka gets ready in 30 minutes and heads down.
             ~minutes+=30
             ->Kitchen
     =SixPM
@@ -44,15 +47,13 @@ INCLUDE Functions.ink
             MOM: Did your friends like the croquettes?
         }
         
-        Asuka decided to get ready for bed.
+        +[Go to bed.] Asuka decided to get ready for bed.
         ~minutes= 0
         ->Church
-        
-        
-
 
 ===Kitchen===
     ______________________________________________
+    {knowBodySearch: Loop: {ResetLoop+1}}
     Location: Kitchen.
     Time: {time()}
     {minutes==450:
@@ -95,19 +96,20 @@ INCLUDE Functions.ink
         ASUKA: Wait, again?
         }
         
-        ++[Nod noncommitally.] Asuka gives a nod and gets back to her food.
+        ++[Go back to your breakfast, no response.] Asuka gives a nod and gets back to her food.
         
-        +[Rush to school.]
+        +[Go to school, skip breakfast.]
         ASUKA: Nah, I'll grab a snack at school, I have to rush now.
         
         - MOM: Before you leave, here's your lunch bag!
         
-        + [Take the lunch and leave.] Asuka grabs her bag and heads outside.
+        + [Go to school.] Asuka grabs her bag and heads outside.
         ~minutes+=15
         ->Road
 
 ===Road===
     ______________________________________________
+    {knowBodySearch: Loop: {ResetLoop+1}}
     Location: Main Road
     Time: {time()}
 
@@ -117,22 +119,25 @@ INCLUDE Functions.ink
  
     Across the street, Rumiko is being dropped off by her older boyfriend.
  
-    +[Ignore gossip and walk to school.] 
-    *[Listen in.]
+    *[Go slower, keep listening.] 
     ~minutes+=15
     Asuka decides to keep listening.
         SCHOOL BOY 1: He is like, what, 30? Maybe I have a chance after all...
-    
-    - Asuka pays no further heed to the conversation and marches to school.
+    +[Go faster, ignore gossip.] Asuka decides to pick up her pace.
+    - She pays no further heed to the conversation and marches to school.
     ~minutes+=30
+        
     ->Class
+    
+//SCHOOL PREMISES----------------------------------------------
 
 ===Class===
     ______________________________________________
+    {knowBodySearch: Loop: {ResetLoop+1}}
     Location: Class
     Time: {time()}
-    {minuteCalculator(13,00)}
-    Asuka steps into her classroom and walks to her desk.
+    //  {minuteCalculator(12,45)}
+    // Asuka steps into her classroom and walks to her desk.
 
     {minutes:
     -510: ->EightThirtyAM
@@ -142,6 +147,10 @@ INCLUDE Functions.ink
     -735: ->TwelveFifteenPM
     -780: ->OneTenPM_TimeSkip
     -885: ->TwoFortyFivePM
+    -45: ->TwelveFortyFiveAM
+    -30: ->TwelveFifteenAM
+    -60: ->OneAM
+    -75: ->OneFifteenAM
     }
     =EightThirtyAM
         She made it before time.
@@ -150,7 +159,7 @@ INCLUDE Functions.ink
         
         Yuki steps outside the class. 
         
-        +{EightFortyFiveAM}[Follow Yuki.] 
+        +{lockedRoomDiscovered}[Follow Yuki.] 
         Asuka follows Yuki out of the classroom.
         ->Library
         +[Take seat.]
@@ -168,13 +177,28 @@ INCLUDE Functions.ink
         }
         
         {ResetLoop==1:
-        Isn't that Shota's desk?
+        Isn't that Shota's desk? Were they framing him for theft?
+        ~findTruthTheft = true
         }
         ->NineAM
     =NineAM
         There is commotion in the class and the committee head is speaking to everyone.
         
         YUKI: The committee funds are missing... Has anyone seen anything?
+        
+        {ResetLoop==1:
+            Before anyone can say anything, Takeshiro barges in.
+            TAKESHIRO: Where is Shota?
+            
+            Shota enters at the very moment. Takeshiro drags him outside. Rumiko and Asuka follow.
+            
+            Shota tells them about body search.
+            
+            They don't what to do with this information yet, they just wait for the night.
+            ~knowBodySearch = true
+            ~minutes = 780
+            ->Class
+        }
         
         Shota gets blamed for theft.
         
@@ -184,7 +208,7 @@ INCLUDE Functions.ink
     ~minutes=720
         It's lunch time.
         ~minutes+=15
-        + Asuka heads out to the field to have food alone.
+        + [Go to the field.] Asuka heads out to the field to have food alone.
         ->Field.
         +{AsukaShota>0} Asuka asks Shota if he'd like to have lunch with her.
         ->TwelveFifteenPM
@@ -205,8 +229,53 @@ INCLUDE Functions.ink
         Classes go on as usual.
         ->TwoFortyFivePM
         
+        
+//NIGHT-------------------------------------------------------
+    
+    =TwelveFifteenAM
+        Asuka comes across the locked cabinet
+        {lockedRoomDiscovered: 
+                    <> again
+            -else: 
+                ~lockedRoomDiscovered = true        
+            }<>.
+        +[Open it.]
+        {keyFound:
+            Asuka opens it with the key she got from Yuki.
+            Inside lies a severed, shrivelled foot.
+            ->END
+        -else:
+            Asuka needs a key for this. Maybe Yuki, the class president will have one. She comes in early to school. She should try talking to her.
+        }
+        ->ResetLoop
+    =TwelveFortyFiveAM
+      They end up in their classroom.
+      
+      When they're trying to find a place to hide better, they come across a locked cabinet.
+      ~lockedRoomDiscovered = true
+      Takeshiro gets Asuka to hide under a desk.
+      
+      Asuka can't see where he chose to hide but she remains quiet.
+      ~minutes+=15
+      ->Class
+      
+      =OneAM
+       Wet footsteps.
+       
+       Takeshiro is killed by the Red Person.
+       ~minutes+=15
+       ->Class
+       
+       =OneFifteenAM
+       
+       Asuka is killed.
+       ->ResetLoop
+    
+        
+        
 ===Field===
     ______________________________________________
+    {knowBodySearch: Loop: {ResetLoop+1}}
     Location: Field
     Time: {time()}
     {minutes:
@@ -221,44 +290,72 @@ INCLUDE Functions.ink
         +[Go the longer route, through the nursery.] She decides to go back the longer route, through the nursery.
         ->Nursery
         +[Go back the shorter route.] She decides to go straight back to the building.
-        ~minutes=885
+        ~minutes=780
         ->Class
     
     ->Nursery
 
 ===Nursery===
     ______________________________________________
+    {knowBodySearch: Loop: {ResetLoop+1}}
     Location: Nursery
-    Time: {time()}.
+    Time: {time()}
     {minutes:
     -750:->TwelveThirtyPM
+    -15: ->TwelveFifteenAM
+    -30: ->TwelveThirtyAM
     }
+    //add a statement with a function that tracks which node you come from and at what time.
     =TwelveThirtyPM
     Asuka walks through the nursery.
     
     The someone with the guy is not Rumiko. Is he cheating on her?
     
     She heads to the church.
+    ~minutes+=15
     ->Church
+    
+
+//NIGHT-------------------------------------------------------
+    =TwelveFifteenAM
+    Asuka steps out into the dark.
+    
+    Footsteps are heard.
+    
+    The last thing Asuka sees before her head is thrashed is a little faceless girl covered in red blood with a plushtoy.
+    ~minutes = 420
+    ->ResetLoop
+    
+    =TwelveThirtyAM
+    Suddenly, Shota is being repeatedly thrashed against a locker.
+    Takeshiro drags her out of the room.
+    ->Class
+    
+    
 
 ===Church===
-
     ______________________________________________
+    {knowBodySearch: Loop: {ResetLoop+1}}
     Location: Church
-    Time: {time()}.
+    Time: {time()}
     {minutes:
     -0:->TwelveAm
-    -else: ->TwelveFortyFivePM
+    -765: ->TwelveFortyFivePM
     }
     =TwelveFortyFivePM
         The church is empty. A coffin lies on stage. 
         
         Asuka finds the door to the locker room that leads back to the school
         ->LockerRoom
+        
+//NIGHT-------------------------------------------------------
     =TwelveAm
         Minutes ago Asuka was in her bed and now she is in the school chapel.
         
         Everyone is there.
+        
+        {ResetLoop:
+        -0:
         
         SHOTA: I knew it was the body search.
         
@@ -267,40 +364,114 @@ INCLUDE Functions.ink
         RUMIKO: I am heading out.
         
         Rumiko leaves from the nursery exit.
+        -1:
+        // RUMIKO: Nope, not doing it again.
+        
+        // ASUKA: If you're going to leave at least don't go through that door... the Red Person is right there.
+        
+        // RUMIKO: Whatever.
+        
+        // Rumiko leaves from the other door.
+        
+        ASUKA: Let's split and try find the body parts.
+        
+        }
         ~minutes+=15
         
         ->TwelveFifteenAM
         
     =TwelveFifteenAM
+    {ResetLoop:
+        -0:
         A crash. Rumiko's body has been thrashed through the window.
         
         SHOTA: We're not alone, we have to run!
         
-        Asuka and Takeshiro follow Shota.
-        ~minutes+=15
+        Shota starts running towards the door leading back to the school.
+        -1:
+        TAKESHIRO: Where would you like to go?
+        }
+        
+        +[Go to the door towards the nursery.]
+            {ResetLoop:
+            - 0:Somehow, Asuka decides to go the way Rumiko went. She wanted to find out what happened.
+            -else: ASUKA: I am going to go to the nursery.
+            }
+            ->Nursery
+         +[Go to the door towards school.]  
+        {ResetLoop:
+            - 0:Asuka and Takeshiro follow Shota.
+            -else: ASUKA: I am going to go towards the locker room.
+            }
         ->LockerRoom
 
 ===LockerRoom===
     ______________________________________________
+    {knowBodySearch: Loop: {ResetLoop+1}}
     Location: Locker Room
-    Time: {time()}.
+    Time: {time()}
     {minutes:
+    -15: ->TwelveFifteenAM
     -30:->TwelveThirtyAM
-    -else: ->TwelveFortyFivePM
+    -765: ->TwelveFortyFivePM
     }
     =TwelveFortyFivePM
         Asuka finds Takeshiro with a couple girls in the locker room. She nods at him before heading back to class.
-        ~minutes=885
+        ~minutes=780
         ->Class
+        
+//NIGHT-------------------------------------------------------
+    
+    =TwelveFifteenAM
+    {ResetLoop:
+            - 0:
+            They enter the locker room and get separated between different rows of lockers.
+            
+            Takeshiro finds Asuka and beckons her over.
+            
+            //add choice that clarifies how movement works at night once you know how movement works at night.
+            ~minutes+=15
+            ->LockerRoom
+            -else: 
+            Asuka enters the locker room.
+            +[Go to the classroom.]
+            ~minutes+=15
+            ->Class
+    }
     
     =TwelveThirtyAM
-        
-        
+        Suddenly, Shota is being repeatedly thrashed against a locker.
+        Takeshiro drags her out of the room.
+        ~minutes+=15
+        ->Class
 
-
-->ResetLoop
+        //find a way to go back to the node it called from.
+        
 ===Library===
-=EightThirtyAM
-Yuki enters the library. Asuka follows her in.
+    {knowBodySearch: Loop: {ResetLoop+1}}
+    Location: Library
+    Time: {time()}
+    {minutes:
+    -510: ->EightThirtyAM    
+    }
+    =EightThirtyAM
+        Yuki enters the library. Asuka follows her in.
+        
+        ASUKA: Yuki can you give me the keys to class cabinet?
+        
+        YUKI: How can I trust you?
+        
+        +[Try convince her] ASUKA: You can trust me.
+        YUKI: No.
+        +{findTruthTheft}[Expose Shota being framed for theft].
+        ASUKA: Shota's being framed for theft.
+        Yuki: Oh wow... Okay I trust you I guess. Here are the keys.
+        ~keyFound = true
+        
+    -Asuka heads back to class.
+        
+        ~minutes+=15
+        ->Class
+        
 
 ->END

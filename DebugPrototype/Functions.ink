@@ -1,7 +1,16 @@
 VAR minutes = 420
 
+//relationship trackers
 VAR AsukaShota=0
 VAR AsukaRumiko=0
+
+//general flags
+VAR knowBodySearch = false
+
+//act1 puzzle flags
+VAR lockedRoomDiscovered = false
+VAR findTruthTheft = false
+VAR keyFound = false
 
 VAR croquetteCount = 4
 
