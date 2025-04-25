@@ -15,11 +15,16 @@ VAR totalAllowedMoves= allowedMoves
 //act 1 variables
 VAR keyFound = false
 VAR savedShota = false
+VAR needKey = false
+VAR knowAboutFramedTheft = false
+VAR foundFoot = false
+
 
 VAR AsukaShota=0
 VAR AsukaRumiko=0
 
 VAR croquetteCount = 4
+VAR bodyPartsFound = 0
 
 VAR currentNode = ->Bedroom
 VAR previousNode = ->Bedroom
@@ -117,6 +122,12 @@ VAR previousNode = ->Bedroom
 ===function again()===
 {ResetLoop >= 1: again|}
 
+// ===function foundBodyPart(bodypart)===
+// {bodyPartsFound=="": 
+//     ~bodyPartsFound = bodyPart
+// -else:
+//     ~bodyPartsFound = bodyPartsFound+ ", "+ bodyPart 
+// }
 
 //ui functions
 === function show_panel(location) ===

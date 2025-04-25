@@ -134,7 +134,7 @@ INCLUDE SpecialKnots.ink
 ===Road===
 {show_panel("Road")}
     {
-    -totalMinutes>=480&&totalMinutes<485:
+    -totalMinutes<485:
     ->cat
     -else:
     ->gossip
@@ -193,29 +193,30 @@ INCLUDE SpecialKnots.ink
         ->shota_blame
     }
     =early
-        // She made it before time.
+        She made it before time.
         
-        // Only the committee head Yuki and a few other club members are present in the class.
+        Only the committee head Yuki and a few other club members are present in the class.
         
-        // Yuki steps outside the class. 
+        Yuki steps outside the class. 
         
-        // +{EightFortyFiveAM}[Follow Yuki.] 
-        // Asuka follows Yuki out of the classroom.
-        // ->Library
-        // +[Take seat.]
-        // Asuka takes her seat.
+        +[Follow Yuki.] 
+        Asuka follows Yuki out of the classroom.
+        ->Library
+        +[Take seat.]
+        Asuka takes her seat.
         
-        // ->EightFortyFiveAM
+        ->GoToNode(->suspicious)
         ->DONE
         
     =suspicious
         Asuka can see something suspicious happening.
-        +[Enter classroom.]
+        +[Stay in classroom.]
         ->GoToNode(->framing_shota)
         +[Go to the library.]
+        Asuka decides to ignore that and go to the library. She needs to find a book.
         ->GoToNode(->Library)
     =framing_shota
-    
+        ~knowAboutFramedTheft = true
         Asuka can see 2 students hide money at a desk.
         
         {framing_shota==0:
@@ -250,8 +251,14 @@ INCLUDE SpecialKnots.ink
         }
         
     
-        Shota gets blamed for theft.
-        
+        {savedShota!=true:
+            Shota gets blamed for theft.
+        -else:
+            Yuki asks them if they're sure.
+            They sense she knows.
+            They confess.
+            Shota looks at Asuka in recognition.
+        }
         ->GoToNode(->free_class)
         
     =free_class
@@ -280,10 +287,10 @@ INCLUDE SpecialKnots.ink
         SHOTA:Well. It's the two of us.
         ->GoToNode(->shota_asuka_lunch)
         
-        +[Have lunch with Shota.]
+        +{ResetLoop>1}[Have lunch with Shota.]
         ->GoToNode(->shota_asuka_lunch)
         
-        +{ResetLoop>1}[Have lunch alone.]
+        +[Have lunch alone.]
         Asuka heads out to the field to have food alone.
         ->Field
         
@@ -325,6 +332,7 @@ INCLUDE SpecialKnots.ink
 ->TwelveFifteenPM
     =TwelveFifteenPM
         Asuka finishes her lunch and she is full so puts her croquettes back untouched.
+        ~add_time(30)
     
     ->Nursery
 
@@ -343,7 +351,7 @@ INCLUDE SpecialKnots.ink
         
         She looks like a normal girl but her presence in this scenario is jarring. And for some reason, she can't seem to look into her eyes.  
         -
-            *Asuka tries to look up, but she only sees a red face with a toothy smile.
+            +Asuka tries to look up, but she only sees a red face with a toothy smile.
             "Please... find my <em>BODY</>."
         ->GoToNode(->Chapel_Night)
 
@@ -360,50 +368,92 @@ INCLUDE SpecialKnots.ink
 
 ===Library===
 {show_panel("Library")}
-Asuka finds Yuki alone in the library.
+{
+    -totalMinutes>=485&&totalMinutes<510: ->asuka_yuki_interaction
+}    
+    =asuka_yuki_interaction
+        Asuka finds Yuki alone in the library.
+        
+        {needKey == true &&keyFound!=true:
+            ->GoToNode(->ask_yuki_keys)
+        }
+        
+        {knowAboutFramedTheft == true &&savedShota!=true:
+            ->GoToNode(->tell_yuki_theft)
+        }
+        
+        ASUKA: Hey Yuki.
+        
+        YUKI: Hey Asuka. 
+        
+        Asuka and Yuki have small talk. 
+        ->GoToNode(->stay_or_class)
 
-Yuki has all the keys in the school.
-
-    *ASUKA: I need keys.
-    YUKI: Yeah, here you go.
-    ~keyFound = true
-        **ASUKA: BTW, two of the students framed Shota
+    =stay_or_class  
+    ~add_time(25)
+        Yuki says it's time for meeting and leaves for class.
+        +[Go to class.]
+            Asuka decides to follow Yuki back to class after a bit.
+            ->GoToNode(->Class)
+        +[Stay in library.]
+            Asuka doesn't feel like going to class.
+            ->GoToNode(->stay_in_library)
+            
+    =stay_in_library
+        {ResetLoop==1:
+        Asuka decides to stay in the library as she knows the class is ran by a sub.
+        - else:
+        Asuka decides to stay in the library
+        //probably a better branch later
+        }
+        
+        +[Read book.]
+        //maybe 15 minute loops with options to do more stuff
+            Asuka reads book.
+            
+            Soon it is time for lunch. 
+            
+            ->GoToNode(->Class.lunch)
+        +[Talk to librarian.]
+            Asuka walks up to the librarian
+            ++{body_search_first_talk>=1}[Mention Body Search.]
+            ASUKA: Do you know about body search?
+            PROF TOMA: ...no....
+            ->GoToNode(->Class.lunch)
+            ++[Ask about the book she wanted.]
+            {body_search_first_talk>=1 : 
+                Asuka decided to not mention the body search.
+            }
+            She asks him he has difficulty finding the book.
+            He gets up to get the book.
+            Asuka notices a peculiar book on his table.
+            +++[Look closer.]
+                ->GoToNode(->body_search_journal)
+            +++[Wait in silence]
+                Asuka doesn't pay the book more attention and waits for Prof. Toma to bring the book back.
+            -
+                ->GoToNode(->go_have_lunch)
+                
+    =tell_yuki_theft
+        +ASUKA: BTW, two of the students framed Shota
             ~savedShota = true
-        **ASUKA: Uh... uh..
-    *ASUKA: Uh.... uh...
+        +ASUKA: Uh... uh..
+        -
+        ->GoToNode(->Library)
+        
+    =ask_yuki_keys    
+        Yuki has all the keys in the school.
+            +ASUKA: I need keys.
+                YUKI: Why do you need them?
+                
+                ++ASUKA: I am on class cleaning duty this week and I lost my copy.
+                    YUKI: Okay, here you go.
+                    ~keyFound = true
+                ++ASUKA: I think I deserve them more than you.
+                    YUKI: Mhm... no.
+                -
+                ->GoToNode(->stay_or_class)
     
--YUKI: ...alright.
-
-{ResetLoop==1:
-Asuka decides to stay in the library as she knows the class is ran by a sub.
-- else:
-Asuka decides to stay in the library
-//probably a better branch later
-}
-
-+[Read book.]
-Asuka reads book.
-
-Soon it is time for lunch. 
-
-->GoToNode(->Class.lunch)
-+[Talk to librarian.]
-    Asuka walks up to the librarian
-    ++[Mention Body Search.]
-    ASUKA: Do you know about body search?
-    PROF TOMA: ...no....
-    ->GoToNode(->Class.lunch)
-    ++[Ask about a random book.]
-    Asuka decided to not mention the body search.
-    She asks him he has difficulty finding a random book.
-    He gets up to get the book.
-    Asuka notices a peculiar book on his table.
-    +++[Look closer.]
-        ->body_search_journal
-    +++[Wait in silence]
-        Asuka doesn't pay the book more attention and waits for Prof. Toma to bring the book back.
-    -
-        ->GoToNode(->go_have_lunch)
     =body_search_journal
         Asuka decides to pick up the book. It seems to be handwritten notes. The title says "Body Search".
         +[Look closer.]
