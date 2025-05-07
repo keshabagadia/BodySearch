@@ -1,14 +1,18 @@
 ===Chapel_Night===
-~totalMinutes = 0
-{show_panel("Chapel")}
+{show_panel_night("SCHOOL CHAPEL")}
 {movesTaken==0:
     ->body_search_start
     }
 Asuka is back in the chapel.
 ->GoToNode(->choices)
 =body_search_start
-    Minutes ago Asuka was somewhere else and now she is in the school chapel. It is dark.
-            There are others there.
+The room is tall and narrow, dust motes drifting in streams of moonlight. 
+
+She’s certain she wasn't here moments ago, and just as certain she’s here in this moment.
+
+Asuka’s brain folds in on itself, trying to reconcile the dissonance. But her heart is inexplicably still, somehow at ease with a reality that refuses to make sense.
+
+It's too dark for her to see, but she can hear voices.
             {ResetLoop:
                 -0: ->first_time
                 -else:
@@ -17,26 +21,53 @@ Asuka is back in the chapel.
                 
             }
     =first_time
-        SHOTA: Did you guys see her too?
+    {set_companion("Rumiko")}
+    {set_companion("Shota")}
+    {set_companion("Takeshiro")}
+    +[Try to see.]
+    Asuka blinks, her eyes adjusting to the dark.
+    +[Try to go back to sleep.]
+    Asuka tries to press her eyes close, willing this strange nightmare away. But she can't.
+    -
+        She can see two figures.
+        
+        TAKESHIRO: Shota... Can you please stand still?
+        
+        Shota pays him no heed as he continues to circle around the room, mumbling to himself.
+        
+        SHOTA: No... no... no... this isn't happening. This has to be a dream...
+        
+        ASUKA: Takeshiro?
+        
+        TAKESHIRO: Asuka... you too?
+        
+        Rumiko bursts in from the side aisle, frantic and wide-eyed.
                 
-        TAKESHIRO: What the fuck is going on?
+        RUMIKO: What the fuck is going on??? Why am I here? Why are <em>you</em> guys here?
         
-        RUMIKO: I am heading out.
+        +[Mention the red person.]
+        ASUKA: Um...did you all see the red person too?
+        +[Stand in silence.]
+        TAKESHIRO: I was walking back home and suddenly... I was here.
+      -  
+        Shota abruptly stops his chanting to audibly gasp.
+        SHOTA: The red person...
         
-        Rumiko leaves from the nursery exit.
+        RUMIKO: Absolutely not. This is some freak prank... I am heading out.
         
-        ASUKA: What should we do?
-
-        SHOTA: I didn't know it was real....
+        ASUKA: Rumiko wait let's---
+        Rumiko pivots and storms towards the side exit as the darkness swallows her.
         
-        TAKESHIRO: Can you tell us what the hell is happening if you know something?
+        TAKESHIRO: What now...
+        
+        ->GoToNode(->choices)
         
         Suddenly, a crash. Rumiko's body has been thrashed through the window.
         
         SHOTA: We're not alone, we have to run!
         
         Shota runs towards the lobby connecting the school with the chapel.
-        ->GoToNode(->choices)
+
     =prep
         ASUKA: We should try and search for the body I guess....
         +[Ask Takeshiro to join.]
@@ -58,25 +89,75 @@ Asuka is back in the chapel.
         ->GoToNode(->choices)
         
     =choices
-        +[Look around.]
-        ->GoToNode_Night(->look_around)
+    Asuka thinks about what to do next.
+        +{look_around<Chapel_Night} [Look around.]
+            ->GoToNode_Night(->look_around)
+        // +{look_around>=Chapel_Night} [Space out{wait_for_something>=Chapel_Night:<> again}.]
+        //     ->GoToNode_Night(->wait_for_something)
         +[Go to the lobby.]
-        ->GoToNode_Night(->Lobby_Night)
+        Asuka considers going to the lobby.
+                ->GoToNode_Night(->Lobby_Night)
         +[Go to the field.]
-        ->GoToNode_Night(->Field_Night)
+                Asuka considers going to the field.        
+            ->GoToNode_Night(->Field_Night)
     
-    =look_around
-        {bodyPartsFound==0:
-            Asuka finds an old and empty coffin.
-        -else:
-            Asuka finds a coffin. When she looks inside, she finds {foundFoot==true: <>->foot_in_coffin}
-        }
+=look_around
+Asuka decides to take in her surroundings once again. 
+
+ Dust motes float, menacingly still. Wooden pews are lined on either side of the room. 
+ 
+ A modest stage with a coffin sits at the back.  
+
+Near the front, the main entrance leads outside to the school field.
+
+To the right is the side exit, connecting back to the main school lobby.
+
++[Look closer at the coffin.]
+    {ResetLoop==0: ->GoToNode_Night(->coffin_talk)}
+    ->GoToNode_Night(->coffin)
++{ResetLoop>=1}[Do something else.]
+    ->GoToNode(->choices)
+=coffin_talk
+    TAKESHIRO: What is a coffin doing in a school chapel?
+    ->coffin
+=coffin
+    Asuka walks up to the coffin.  The lid is half-ajar, its hinges rusted. She pushes it open, a resounding creak in the room.
+{bodyPartsFound==0:
+ It is empty, but it has an eerie indent of a body in there. 
+    ->GoToNode(->choices)
+-else:
+    Inside she finds,  
+    {foundFoot==true:  
+        ->foot_in_coffin
+    }
+}
+
         
     =foot_in_coffin
-    an old and severed foot.
+    an old and severed foot, fitting the mould a little too perfectly.
         ->GoToNode(->choices)
+        
+    =follow_shota
+    ASUKA: Do we want to try and get out of here too?
+    
+    TAKESHIRO: Um... I don't know.. I think we should stay put and stick together for now. What do you say, Shota?
+    
+    SHOTA: This isn't real... this is isn't real.....
+    
+    Takeshiro sighs in resignation.
+    ->GoToNode(->choices)
+    
+    =wait_for_something
+    Asuka's brain slows and numbs down. She tries to space out.
+      A thick silence takes over the space, but it doesn't last too long. 
+      ->GoToNode(->choices)
+    
+    
     
 ===Field_Night
+{show_panel_night("FOOTBALL FIELD")}
+            {ResetLoop==0&&movesTaken<=3: ->GoToNode(->Chapel_Night.follow_shota)}
+Without a lo
         The grass is wet, the sprinklers weirdly go off at night.
         ->GoToNode(->choices)
     =choices
@@ -120,6 +201,7 @@ Asuka is back in the chapel.
         Asuka looks around in the school corridor.
         ->GoToNode(->Corridor_Night)
 ===Class_Night===
+{show_panel_night("CLASS CORRIDOR")}
         {keyFound==false: 
             ->locked_door
         -else:
@@ -158,16 +240,30 @@ Asuka is back in the chapel.
     ->GoToNode(->Corridor_Night)
 
 ===Lobby_Night===
+{show_panel_night("SCHOOL LOBBY")}
+    {ResetLoop==0&&movesTaken<=3: ->GoToNode(->Chapel_Night.follow_shota)}
     Asuka finds herself in the school lobby.
     ->choices
     
     =choices
-        +[Look around.]
-        ->placeholder_knot
+        +{look_around<Chapel_Night}[Look around.]
+        ->GoToNode_Night(->look_around)
         +[Go to the chapel]
         ->GoToNode_Night(->Chapel_Night)
         +[Go to the corridor.]
         ->GoToNode_Night(->Corridor_Night)
+    =look_around
+     Asuka looks around in the school lobby. There is nothing to see.
+     ->GoToNode(->choices)
 ===Deaths===
-    The Red Person is right behind her. She is standing one second, and facing the hard ground the next. Pain floods in, her vision darkens.
+~ temp r = RANDOM(0,4)
+
+{r:
+- 0: Suddenly, the Red Person drops from above and grabs her head mid-step. Drives her skull into the floor—jaw splits, teeth scatter, spine snaps like dry twigs.
+- 1: Suddenly, the Red Person slams into her from the side, claws plunging through her ribs. Bones explode outward, organs splash the wall.
+- 2: She turns around the corner, but the Red Person is already there. It grabs her face and pulls. Mouth tears past her ears before the neck gives way.
+- 3: In a moment, red arms are yanking her down. Pelvis snaps against tile as she vanishes screaming.
+- 4: She doesn't have a second to process when her body abruptly folds inward. Bones crack, blood leaks from eyes and she collapses.
+}
+
     ->ResetLoop
