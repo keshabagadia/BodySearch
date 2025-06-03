@@ -1,10 +1,6 @@
-# ⏳ TIME LOOP – Horror Narrative Prototype
+# Body Search
 
 **A work-in-progress interactive horror adventure** built using **Inky**, exploring a time loop narrative system. It is inspired by this japanese film: https://www.youtube.com/watch?v=Y8yvXoyLPvM.
-
-## 🎮 About the Project
-
-You wake up in a familiar room. Again.
 
 This interactive story is written in **Ink** and powered by **Inky**, Inkle Studios' scripting language for branching narrative.
 ## 📁 How to Explore
